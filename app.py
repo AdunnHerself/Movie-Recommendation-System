@@ -8,8 +8,7 @@ st.set_page_config(page_title="Movie Recommendation System", layout="centered")
 # Load the datasets
 movie_dataset = pkl.load(open('movies_dataset.pkl', 'rb'))
 
-#Load model
-
+# Load model
 # Function to load and decompress the model
 def load_compressed_model(filepath):
     with lzma.open(filepath, 'rb') as compressed_file:
@@ -21,7 +20,6 @@ compressed_model_path = 'similarity.pkl.xz'
 
 # Load the model
 similarity = load_compressed_model(compressed_model_path)
-#similarity = pkl.load(open('similarity.pkl', 'rb'))
 
 # Sidebar for page selection
 page = st.sidebar.selectbox("Select a Page", ["Home", "Recommendation"])
@@ -73,10 +71,10 @@ if page == "Home":
     st.markdown("<div class='main-title'>🎬 Welcome to the Movie Recommendation System 🍿</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='subheader'>Introduction</div>", unsafe_allow_html=True)
-    st.markdown("<div class='text'>Welcome to the Movie Recommendation System! This web application helps you find movies or TV shows similar to the one you select. By selecting a movie or TV show, this system provides you with personalized recommendations based on a similarity metric.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='text'>Welcome to the Movie Recommendation System! This web application helps you find movies or TV shows similar to the one you select. By selecting a movie or TV show, this system provides you with personalized recommendations based on a similarity metric known as Cosine Similarity.</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='subheader'>How It Works</div>", unsafe_allow_html=True)
-    st.markdown("<div class='text'>The recommendation system employs a similarity metric to identify titles similar to your selection. It uses a Netflix dataset from Kaggle, leveraging features such as the director, cast, genres, and description of each title.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='text'>The recommendation system employs cosine similarity to identify titles similar to your selection. It uses a Netflix dataset from Kaggle, leveraging features such as the director, cast, genres, and description of each title.</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='subheader'>Technologies Used</div>", unsafe_allow_html=True)
     st.markdown("<div class='text'><ul><li><b>Streamlit</b>: For building the interactive web application.</li><li><b>Python</b>: The programming language used for data processing and recommendation metric.</li><li><b>Machine Learning</b>: Utilized for calculating similarities between different titles.</li></ul></div>", unsafe_allow_html=True)
@@ -128,17 +126,17 @@ elif page == "Recommendation":
     # Add the movie poster at the top
     st.markdown("<div class='main-header'>🎬 Movie Recommendation System 🍿</div>", unsafe_allow_html=True)
 
-    st.image("movie_poster.png", caption="", use_column_width=True)
-
+    #st.image("movie_poster.png", caption="", use_column_width=True)
 
     def recommend_movie(movie_name): 
         movie_index = movie_dataset[movie_dataset['title'] == movie_name].index[0]
         similar_movies = sorted(list(enumerate(similarity[movie_index])), reverse=True, key=lambda vector: vector[1])
 
         recommendations = []
-
         for i in similar_movies[1:6]:  # Skip the first movie (itself)
-            recommendations.append(f"If you love '{movie_name}', you might enjoy '{movie_dataset.iloc[i[0]].title}'.")
+            movie_title = movie_dataset.iloc[i[0]].title
+            similarity_score = i[1] * 100  # Convert to percentage
+            recommendations.append(f"If you love '{movie_name}', you might enjoy '{movie_title}' with a similarity of {similarity_score:.2f}%.")
         
         return recommendations
 
